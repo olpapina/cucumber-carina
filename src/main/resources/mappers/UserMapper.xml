@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.solvd.cucumbercarina.database.persistence.UserMapper">
+
+	<insert id="create" useGeneratedKeys="true" keyProperty="id">
+
+		INSERT INTO Users (user_name, user_password, first_name, last_name, zip_code) VALUES (
+				#{userName},
+				#{password},
+				#{firstName},
+				#{lastName},
+				#{zipCode})
+	</insert>
+
+	<select id="findById" resultMap="UserResultMap">
+		select u.id, u.user_name, u.user_password, u.first_name, u.last_name, u.zip_code from users as u where u.id=#{id};
+	</select>
+
+	<select id="findByUserName" resultMap="UserResultMap">
+		<![CDATA[
+			WHERE U.USER_NAME = #{name};
+		]]>
+	</select>
+
+	<update id="update">
+		<![CDATA[
+			UPDATE
+			    users
+		]]>
+		<set>
+			<if test="null != user_name">
+		            <![CDATA[
+		               USER_NAME = #{name},
+		            ]]>
+			</if>
+			<if test="null != user_password">
+		            <![CDATA[
+		               USER_PASSWORD = #{password},
+		            ]]>
+			</if>
+		</set>
+		<![CDATA[
+			WHERE
+			    ID = #{id}
+		]]>
+	</update>
+
+	<delete id="delete">
+		<![CDATA[
+			DELETE FROM USERS
+			WHERE ID = #{id}
+		]]>
+	</delete>
+
+	<resultMap type="com.solvd.cucumbercarina.database.domain.User"
+		id="UserResultMap" autoMapping="false">
+		<id column="ID" property="id" />
+		<result column="id" property="id" />
+		<result column="USER_NAME" property="userName" />
+		<result column="USER_PASSWORD" property="password" />
+		<result column="FIRST_NAME" property="firstName" />
+		<result column="LAST_NAME" property="lastName" />
+		<result column="ZIP_CODE" property="zipCode" />
+	</resultMap>
+
+</mapper>
