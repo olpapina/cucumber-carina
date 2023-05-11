@@ -29,3 +29,20 @@ Feature: Swag Labs testing
     And Error message is present on the page
 
 
+  Scenario: Swag Labs Error message appears during checkout process- passing
+    Given I am on Login page as problem user
+    When I log in using credentials
+    Then page 'Products' is opened
+    And page 'Products' should contains 6 the same pictures instead of different product images
+
+    When I click 'Add to cart' button for products from DB
+    Then products are in the cart, check the quantity
+
+    When I click 'Cart' button
+    Then 'Cart' page is opened
+    And 'Cart' page should contains added products
+    When I click 'Checkout' button
+    Then User data page should be open
+    When I add user info
+    And click Continue button
+    Then Error message appears on the page

@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProductPage extends AbstractPage {
 
@@ -19,6 +20,12 @@ public class ProductPage extends AbstractPage {
 
     @FindBy(id = "shopping_cart_container")
     private ExtendedWebElement cartIcon;
+
+    @FindBy(xpath="//*[contains(@id,'item')]//*[@class='inventory_item_img']")
+    private List<ExtendedWebElement> productImages;
+
+    @FindBy(xpath="//*[@class='shopping_cart_badge']")
+    private ExtendedWebElement quantity;
 
     public ProductPage(WebDriver driver) {
         super(driver);
@@ -36,5 +43,15 @@ public class ProductPage extends AbstractPage {
 
     public void clickAddToCartButton(String product) {
         addToCartButton.format(product).click();
+    }
+
+    public List<String> getImages() {
+        return productImages.stream()
+                .map(product -> product.getAttribute("src"))
+                .collect(Collectors.toList());
+    }
+
+    public Integer getQuantity() {
+        return Integer.parseInt(quantity.getText());
     }
 }

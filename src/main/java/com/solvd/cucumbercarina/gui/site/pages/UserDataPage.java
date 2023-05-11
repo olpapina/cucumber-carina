@@ -20,6 +20,9 @@ public class UserDataPage extends AbstractPage {
     @FindBy(id="continue")
     private ExtendedWebElement continueButton;
 
+    @FindBy(xpath="//*[contains(@class,'error-message-container')]")
+    private ExtendedWebElement errorMessage;
+
 
     public UserDataPage(WebDriver driver) {
         super(driver);
@@ -35,5 +38,14 @@ public class UserDataPage extends AbstractPage {
     public OverviewPage clickContinueButton() {
         continueButton.click();
         return new OverviewPage(driver);
+    }
+
+    public UserDataPage clickContinue() {
+        continueButton.click();
+        return new UserDataPage(driver);
+    }
+
+    public Boolean isErrorPresent() {
+        return errorMessage.isPresent();
     }
 }

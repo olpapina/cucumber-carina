@@ -18,7 +18,6 @@ import java.util.List;
 
 public class SwagLogsLockedSteps extends CucumberRunner implements IDriverPool {
     User user = null;
-    List<String> products = null;
     LoginPage loginPage = null;
 
     @Given("^I am on Login page as locked user$")

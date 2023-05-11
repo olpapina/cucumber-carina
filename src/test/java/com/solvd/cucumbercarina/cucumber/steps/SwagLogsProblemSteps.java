@@ -1,13 +1,12 @@
 package com.solvd.cucumbercarina.cucumber.steps;
 
 import com.qaprosoft.carina.core.foundation.cucumber.CucumberRunner;
+import com.solvd.cucumbercarina.database.domain.User;
+import com.solvd.cucumbercarina.database.domain.UserOrder;
 import com.solvd.cucumbercarina.database.service.UserOrderService;
 import com.solvd.cucumbercarina.database.service.UserService;
 import com.solvd.cucumbercarina.database.service.impl.UserOrderServiceImpl;
 import com.solvd.cucumbercarina.database.service.impl.UserServiceImpl;
-import com.solvd.cucumbercarina.gui.site.components.Product;
-import com.solvd.cucumbercarina.database.domain.User;
-import com.solvd.cucumbercarina.database.domain.UserOrder;
 import com.solvd.cucumbercarina.gui.site.pages.*;
 import com.zebrunner.carina.webdriver.IDriverPool;
 import io.cucumber.java.en.And;
@@ -21,116 +20,102 @@ import java.util.List;
 
 import static com.solvd.cucumbercarina.utils.StringSplitter.getOrderProducts;
 
-public class SwagLogsStandardSteps extends CucumberRunner implements IDriverPool {
-
+public class SwagLogsProblemSteps extends CucumberRunner implements IDriverPool {
     User user = null;
     List<String> products = null;
     LoginPage loginPage = null;
     ProductPage productPage = null;
     CartPage cartPage = null;
     UserDataPage userDataPage = null;
-    OverviewPage overviewPage = null;
-    CompletePage completePage = null;
 
-
-    @Given("^I am on login page as standard user$")
+    @Given("^I am on Login page as problem user$")
     public boolean iAmOnLoginPage() {
         loginPage = new LoginPage(getDriver());
         loginPage.open();
         return loginPage.isPageOpened();
     }
 
-    @When("^I log in using credentials from DB$")
+    @When("^I log in using credentials$")
     public void iLogIntoAccount() {
         UserService userService = new UserServiceImpl();
-        user = userService.selectById(3L);
+        user = userService.selectById(5L);
         loginPage.typeUserName(user.getUserName());
         loginPage.typePassword(user.getPassword());
         productPage = loginPage.clickLoginButton();
         Assert.assertTrue(productPage.isPageOpened(), "Product page is not opened!");
     }
 
-    @Then("^page 'Products' should be open$")
+    @Then("^page 'Products' is opened$")
     public void productPageShouldBeOpen() {
         Assert.assertTrue(productPage.isPageOpened(), "Product page is not opened!");
     }
 
-    @And("^page 'Products' should contains 6 items$")
+    @And("^page 'Products' should contains 6 the same pictures instead of different product images$")
     public void productPageShouldContainsSixItems() {
-        List<Product> products = productPage.getProducts();
-        Assert.assertEquals(products.size(), 6, "Quantity of product doesn't match 6");
+        List<String> productPageImages = productPage.getImages();
+        SoftAssert sa = new SoftAssert();
+        productPageImages.forEach(productPageImage -> sa.assertEquals(productPageImages.get(0), productPageImages.get(1)));
+        sa.assertAll();
     }
 
-    @When("^I add the products from DB in a cart$")
+    @When("^I click 'Add to cart' button for products from DB$")
     public void iAddProductsInCart() {
         UserOrderService userOrderService = new UserOrderServiceImpl();
-        List<UserOrder> userOrders = userOrderService.selectByUserId(3L);
+        List<UserOrder> userOrders = userOrderService.selectByUserId(5L);
         String order = userOrders.get(0).getOrderItems();
 
         products = getOrderProducts(order);
         products.forEach(product -> productPage.clickAddToCartButton(product));
     }
 
-    @And("^I go to 'Cart' page$")
-    public void iGoToCartPage() {
+    @Then("^products are in the cart, check the quantity$")
+    public void checkQuantityProducts() {
+        Integer getQuantityProductPage = productPage.getQuantity();
+        Assert.assertEquals(getQuantityProductPage, products.size(), "please");
+    }
+
+    @When("^I click 'Cart' button$")
+    public void goToCart() {
         cartPage = productPage.clickCartIcon();
         Assert.assertTrue(cartPage.isPageOpened(), "Cart page is not opened!");
     }
 
-    @Then("^page 'Cart' should be open$")
+    @Then("^'Cart' page is opened$")
     public void cartPageShouldBeOpen() {
         Assert.assertTrue(cartPage.isPageOpened(), "Cart page is not opened!");
     }
 
-    @And("^page 'Cart' should contains added products$")
+    @And("^'Cart' page should contains added products$")
     public void cartPageShouldContainsAddedProducts() {
         SoftAssert sa = new SoftAssert();
         products.forEach(product -> sa.assertTrue(cartPage.getProductNames().contains(product), "Cart page doesn't contain the product " + product));
         sa.assertAll();
     }
 
-    @When("^I click Checkout button$")
+    @When("^I click 'Checkout' button$")
     public void iClickCheckout() {
         userDataPage = cartPage.clickCheckoutButton();
         Assert.assertTrue(userDataPage.isPageOpened(), "UserData page is not opened!");
     }
 
-    @Then("^page with user data should be open$")
+    @Then("^User data page should be open$")
     public void userDataPageShouldBeOpen() {
         Assert.assertTrue(userDataPage.isPageOpened(), "UserData page is not opened!");
     }
 
-    @When("^I enter data$")
+    @When("^I add user info$")
     public void iEnterUserData() {
         userDataPage.typeData(user);
-        overviewPage = userDataPage.clickContinueButton();
-        Assert.assertTrue(overviewPage.isPageOpened(), "Overview page is not opened!");
     }
 
-    @Then("^page 'Overview' should be open$")
-    public void pageOverViewShouldBeOpened() {
-        Assert.assertTrue(overviewPage.isPageOpened(), "Overview page is not opened!");
+    @And("^click Continue button$")
+    public void iClickContinue() {
+        userDataPage = userDataPage.clickContinue();
+        Assert.assertTrue(userDataPage.isPageOpened(), "User is not on the same page");
     }
 
-    @And("^page 'Overview' should contains added products$")
-    public void overviewPageShouldContainsAddedProducts() {
-        SoftAssert sa = new SoftAssert();
-        products.forEach(product -> sa.assertTrue(overviewPage.getProductTitles().contains(product), "Overview page doesn't contain the product " + product));
-        sa.assertAll();
-    }
-
-    @When("^I click 'Finish' button")
-    public void clickFinish() {
-        completePage = overviewPage.clickFinishButton();
-    }
-
-    @Then("^page 'Complete' should be open$")
-    public void completePageShouldBeOpened() {
-        Assert.assertTrue(completePage.isPageOpened(), "Complete page is not opened!");
-    }
-
-    @And("^page 'Complete' should contains successful message")
-    public void completePageShouldContains() {
-        Assert.assertTrue(completePage.isCompletedPresent(), "Complete page doesn't contain successful message!");
+    @Then("^Error message appears on the page$")
+    public void iCheckError() {
+        Assert.assertTrue(userDataPage.isErrorPresent(), "Error message doesn't appear");
     }
 }
