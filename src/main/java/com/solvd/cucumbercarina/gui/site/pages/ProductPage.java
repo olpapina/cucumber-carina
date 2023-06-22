@@ -29,7 +29,7 @@ public class ProductPage extends AbstractPage {
 
     public ProductPage(WebDriver driver) {
         super(driver);
-        setPageURL("inventory.html");
+        setPageAbsoluteURL("https://www.saucedemo.com/inventory.html");
     }
 
     public List<Product> getProducts() {
