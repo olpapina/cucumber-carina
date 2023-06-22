@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.solvd.cucumbercarina.database.persistence.UserOrderMapper">
+
+	<insert id="create" useGeneratedKeys="true"
+		keyProperty="id">
+
+			INSERT INTO USER_ORDERS (ORDER_PRODUCTS, USER_ID)
+			VALUES (
+				#{products},
+				#{userId}
+			)
+	</insert>
+
+	<select id="findById"
+		resultMap="UserOrdersResultMap">
+		<![CDATA[
+			WHERE UO.ID = #{id};
+		]]>
+	</select>
+
+	<select id="findByUserId"
+			resultMap="UserOrdersResultMap">
+		select o.order_products from user_orders as o where o.user_id = #{user_id};
+	</select>
+
+	<delete id="delete">
+		<![CDATA[
+			DELETE FROM USER_ORDERS
+			WHERE UO.ID = #{id}
+		]]>
+	</delete>
+
+	<resultMap type="com.solvd.cucumbercarina.database.domain.UserOrder"
+			   id="UserOrdersResultMap" autoMapping="false">
+		<id column="id" property="id" />
+
+		<result column="id" property="id" />
+		<collection property="orderItems" ofType="java.lang.String">
+			<result column="ORDER_PRODUCTS" property="orderItems" />
+		</collection>
+
+	</resultMap>
+
+</mapper>
